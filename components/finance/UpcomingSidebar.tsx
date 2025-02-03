@@ -42,7 +42,7 @@ export function UpcomingSidebar({ type }: UpcomingSidebarProps) {
                     type === "expenses" ? "/api/expenses" : "/api/income";
                 const response = await fetch(`${endpoint}?${params}`);
                 const data = await response.json();
-                setUpcomingItems(data);
+                setUpcomingItems(data ?? []);
             } catch (error) {
                 console.error("Error fetching upcoming items:", error);
             } finally {
@@ -82,7 +82,7 @@ export function UpcomingSidebar({ type }: UpcomingSidebarProps) {
                         </p>
                     ) : (
                         <div className="space-y-4">
-                            {upcomingItems.map((item) => {
+                            {upcomingItems?.map((item) => {
                                 const colors = getCategoryColorClass(
                                     (type === "expenses"
                                         ? item.categoryColor

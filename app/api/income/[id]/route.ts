@@ -1,22 +1,29 @@
 import db from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(request: NextRequest) {
+export async function PUT(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const body = await request.json();
-        const searchParams = request.nextUrl.searchParams;
-        const id = searchParams.get("id");
-        const { amount, source, date, description } = body;
+        const { id } = await params;
+        const { amount, source, date, description } = await request.json();
 
-        const stmt = db.prepare(`
+        const query = `
             UPDATE income 
-            SET amount = ?, source = ?, date = ?, description = ?
-            WHERE id = ?
-        `);
+            SET amount = $1, source = $2, date = $3, description = $4
+            WHERE id = $5
+        `;
 
-        const result = stmt.run(amount, source, date, description, id);
+        const result = await db.query(query, [
+            amount,
+            source,
+            date,
+            description,
+            id,
+        ]);
 
-        if (result.changes === 0) {
+        if (result.rowCount === 0) {
             return NextResponse.json(
                 { error: "Income record not found" },
                 { status: 404 }
@@ -36,15 +43,17 @@ export async function PUT(request: NextRequest) {
     }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const searchParams = request.nextUrl.searchParams;
-        const id = searchParams.get("id");
+        const { id } = await params;
 
-        const stmt = db.prepare("DELETE FROM income WHERE id = ?");
-        const result = stmt.run(id);
+        const query = "DELETE FROM income WHERE id = $1";
+        const result = await db.query(query, [id]);
 
-        if (result.changes === 0) {
+        if (result.rowCount === 0) {
             return NextResponse.json(
                 { error: "Income record not found" },
                 { status: 404 }

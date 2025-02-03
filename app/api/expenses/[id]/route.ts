@@ -1,22 +1,29 @@
 import db from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(request: NextRequest) {
+export async function PUT(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const body = await request.json();
-        const searchParams = request.nextUrl.searchParams;
-        const id = searchParams.get("id");
-        const { amount, category, date, description } = body;
+        const { amount, category, date, description } = await request.json();
+        const { id } = await params;
 
-        const stmt = db.prepare(`
-            UPDATE expenses 
-            SET amount = ?, category = ?, date = ?, description = ?
-            WHERE id = ?
-        `);
+        const query = `
+            UPDATE expense
+            SET amount = $1, category = $2, date = $3, description = $4
+            WHERE id = $5
+        `;
 
-        const result = stmt.run(amount, category, date, description, id);
+        const result = await db.query(query, [
+            amount,
+            category,
+            date,
+            description,
+            id,
+        ]);
 
-        if (result.changes === 0) {
+        if (result.rowCount === 0) {
             return NextResponse.json(
                 { error: "Expense not found" },
                 { status: 404 }
@@ -36,15 +43,18 @@ export async function PUT(request: NextRequest) {
     }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const searchParams = request.nextUrl.searchParams;
-        const id = searchParams.get("id");
+        const { id } = await params;
 
-        const stmt = db.prepare("DELETE FROM expenses WHERE id = ?");
-        const result = stmt.run(id);
+        const query = "DELETE FROM expense WHERE id = $1";
 
-        if (result.changes === 0) {
+        const result = await db.query(query, [id]);
+
+        if (result.rowCount === 0) {
             return NextResponse.json(
                 { error: "Expense not found" },
                 { status: 404 }
