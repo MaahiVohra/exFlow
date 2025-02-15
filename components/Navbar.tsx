@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { UserRound, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import UserAvatar from "@/components/UserAvatar";
 import { login, register } from "@/services/AuthService";
 import { getUserDetails } from "@/services/UserService";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -87,147 +88,153 @@ export default function Navbar() {
     <div className="flex items-center justify-between mb-8">
       <h1 className="text-2xl font-bold flex items-center">
         <Wallet />
-        &nbsp;<span className="text-[#4CAF50]">ex</span>Flow
+        &nbsp;<span className="text-[#4CAF50]">ex</span>FLOW
       </h1>
       <div>
-        {user && (
-          <div className="flex gap-2 items-center">
-            <UserRound />
-            {user?.name}
-          </div>
+        {user ? (
+          <UserAvatar />
+        ) : (
+          <Dialog open={openLoginModal} onOpenChange={setOpenLoginModal}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="data-[state=active]:block">
+                LOGIN
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Welcome</DialogTitle>
+                <DialogDescription>
+                  Sign in to your account or create a new one
+                </DialogDescription>
+              </DialogHeader>
+              <Tabs
+                className="mt-4"
+                value={activeTab}
+                onValueChange={setActiveTab}
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="login">LOGIN</TabsTrigger>
+                  <TabsTrigger value="register">REGISTER</TabsTrigger>
+                </TabsList>
+                <TabsContent value={AUTH_TABS.LOGIN}>
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(loginUser)}
+                      className="space-y-4"
+                    >
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Enter your email"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder="Enter your password"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={form.formState.isSubmitting}
+                      >
+                        {form.formState.isSubmitting
+                          ? "Logging in..."
+                          : "Login"}
+                      </Button>
+                    </form>
+                  </Form>
+                </TabsContent>
+                <TabsContent value={AUTH_TABS.REGISTER} className="space-y-4">
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(registerUser)}
+                      className="space-y-4"
+                    >
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter your name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Enter your email"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder="Enter your password"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={form.formState.isSubmitting}
+                      >
+                        {form.formState.isSubmitting
+                          ? "Creating account..."
+                          : "Create my account"}
+                      </Button>
+                    </form>
+                  </Form>
+                </TabsContent>
+              </Tabs>
+            </DialogContent>
+          </Dialog>
         )}
-        <Dialog open={openLoginModal} onOpenChange={setOpenLoginModal}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="data-[state=active]:block">
-              LOGIN
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Welcome</DialogTitle>
-              <DialogDescription>
-                Sign in to your account or create a new one
-              </DialogDescription>
-            </DialogHeader>
-            <Tabs
-              className="mt-4"
-              value={activeTab}
-              onValueChange={setActiveTab}
-            >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
-              </TabsList>
-              <TabsContent value={AUTH_TABS.LOGIN}>
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(loginUser)}
-                    className="space-y-4"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="Enter your password"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={form.formState.isSubmitting}
-                    >
-                      {form.formState.isSubmitting ? "Logging in..." : "Login"}
-                    </Button>
-                  </form>
-                </Form>
-              </TabsContent>
-              <TabsContent value={AUTH_TABS.REGISTER} className="space-y-4">
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(registerUser)}
-                    className="space-y-4"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your name" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Enter your email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="Enter your password"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={form.formState.isSubmitting}
-                    >
-                      {form.formState.isSubmitting
-                        ? "Creating account..."
-                        : "Create my account"}
-                    </Button>
-                  </form>
-                </Form>
-              </TabsContent>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );
