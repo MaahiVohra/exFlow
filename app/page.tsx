@@ -1,17 +1,13 @@
-'use client'
-import { ExpenseList } from "@/components/expense/ExpenseList"
-import { IncomeList } from "@/components/income/IncomeList"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Wallet } from "lucide-react"
+"use client";
+import { ExpenseList } from "@/components/expense/ExpenseList";
+import { IncomeList } from "@/components/income/IncomeList";
+import Navbar from "@/components/Navbar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function FinanceTrackerPage() {
-
   return (
     <div className="container mx-auto p-4">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold flex items-center"><Wallet />&nbsp;<span className="text-[#4CAF50]">ex</span>Flow</h1>
-      </div>
-
+      <Navbar />
       <Tabs defaultValue="expenses" className="space-y-4">
         <div className="flex items-center justify-between">
           <TabsList>
@@ -21,14 +17,13 @@ export default function FinanceTrackerPage() {
         </div>
 
         <TabsContent value="expenses" className="space-y-4">
-          <ExpenseList  />
+          <ExpenseList />
         </TabsContent>
 
         <TabsContent value="income" className="space-y-4">
-          <IncomeList  />
+          <IncomeList />
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
-
