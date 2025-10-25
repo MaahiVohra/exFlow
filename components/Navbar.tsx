@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Wallet } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
   Form,
@@ -23,9 +23,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import UserAvatar from "@/components/UserAvatar";
-import { login, register } from "@/services/AuthService";
-import { getUserDetails } from "@/services/UserService";
+import UserDropdown from "@/components/UserDropdown";
+import { useAuth } from "@/context/AuthContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -48,9 +47,10 @@ enum AUTH_TABS {
 }
 
 export default function Navbar() {
+  const auth = useAuth();
+
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [activeTab, setActiveTab] = useState<string>(AUTH_TABS.LOGIN);
-  const [user, setUser] = useState<User>();
 
   const form = useForm({
     resolver: zodResolver(
@@ -63,25 +63,12 @@ export default function Navbar() {
     },
   });
 
-  useEffect(() => {
-    getUserDetails("90aa770c-45e1-4800-83a9-489207a8dbcc").then((response) => {
-      setUser(response);
-      console.log(response);
-    });
-  }, []);
-
   async function loginUser(values: LoginFormValues) {
-    login(values).then((response) => {
-      setUser(response);
-      setOpenLoginModal(false);
-    });
+    auth.loginUser(values).then(() => setOpenLoginModal(false));
   }
 
   async function registerUser(values: RegisterFormValues) {
-    register(values).then((response) => {
-      setUser(response);
-      setOpenLoginModal(false);
-    });
+    auth.registerUser(values).then(() => setOpenLoginModal(false));
   }
 
   return (
@@ -91,8 +78,8 @@ export default function Navbar() {
         &nbsp;<span className="text-[#4CAF50]">ex</span>FLOW
       </h1>
       <div>
-        {user ? (
-          <UserAvatar />
+        {auth.user ? (
+          <UserDropdown />
         ) : (
           <Dialog open={openLoginModal} onOpenChange={setOpenLoginModal}>
             <DialogTrigger asChild>

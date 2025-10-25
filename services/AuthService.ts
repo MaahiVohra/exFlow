@@ -12,7 +12,7 @@ export async function login(loginRequest: LoginRequest) {
       },
     });
     if (!response.ok) throw new Error("Failed to login");
-    return (await response.json()) as User;
+    return (await response.json()) as AuthToken;
   } catch (error) {
     console.error("Error logging in user:", error);
     toast({
@@ -33,12 +33,27 @@ export async function register(registerRequest: RegisterRequest) {
       },
     });
     if (!response.ok) throw new Error("Failed to register");
-    return (await response.json()) as User;
+    return (await response.json()) as AuthToken;
   } catch (error) {
     console.error("Error creating an account:", error);
     toast({
       title: "Error",
       description: "Failed to register user. Please try again.",
+      variant: "destructive",
+    });
+  }
+}
+
+export async function logout() {
+  try {
+    const response = await fetch(authBasePath + "/logout");
+    if (!response.ok) throw new Error("Failed to logout");
+    return await response.json();
+  } catch (error) {
+    console.error("Error logging out:", error);
+    toast({
+      title: "Error",
+      description: "Failed to logout user. Please try again.",
       variant: "destructive",
     });
   }

@@ -1,4 +1,5 @@
 "use client";
+
 import { ExpenseList } from "@/components/expense/ExpenseList";
 import { IncomeList } from "@/components/income/IncomeList";
 import Navbar from "@/components/Navbar";

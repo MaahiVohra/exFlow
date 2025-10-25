@@ -1,0 +1,7 @@
+25-10-25
+[x] - auth context to store the user
+[x] - store the auth token in cookie
+[x] - login and register with that
+
+[ ] - user dropdown to logout and view name and email
+[ ] - logout button
